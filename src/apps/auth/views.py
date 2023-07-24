@@ -1,32 +1,46 @@
 import uuid
-from random import randint
+from typing import Coroutine
 
 from fastapi import status
 from fastapi.exceptions import HTTPException
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.auth.tasks import send_email_confirmation, send_email_recovery
-
 from utils.hasher import hash_password, verify_password
+
 from .models import User
 from .schemas import UserCreate
 
 
-async def get_user(email: str, session: AsyncSession):
+async def get_user_by_id(id: int, session: AsyncSession):
+    """ Searching user in database by id """
+    query = select(User).where(User.id == id)
+    result = await session.execute(query)
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+async def get_user_by_email(email: str, session: AsyncSession):
     """ Searching user in database by email """
     query = select(User).where(User.email == email)
     result = await session.execute(query)
     user = result.scalar_one_or_none()
-    await user.awaitable_attrs.profession
-
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-
     return user
 
 
-async def create_activation_code(email: str, session: AsyncSession):
+async def show_user(id: int, session: AsyncSession):
+    """ Showing user """
+    user = await get_user_by_id(id=id, session=session)
+    await user.awaitable_attrs.profession
+    return user
+
+
+async def create_activation_code(email: str, session: AsyncSession) -> str:
     """ Creating activation code for user """
     activation_code = str(uuid.uuid4())
     stmt = (
@@ -68,6 +82,7 @@ async def create_user(user: UserCreate, session: AsyncSession):
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
+    await new_user.awaitable_attrs.profession
 
     send_email_confirmation.delay(
         new_user.email, new_user.activation_code)
@@ -108,14 +123,14 @@ async def create_recovery_code(email: str, session: AsyncSession):
 
 
 async def set_new_password(
-    email: str, recovery_code: int, new_password: str,
+    user_id: int, recovery_code: int, new_password: str,
     session: AsyncSession
 ):
     """ Seting the user's new password """
     await check_activation_code(code=recovery_code, session=session)
     stmt = (
         update(User).
-        where(User.email == email).
+        where(User.id == user_id).
         values(hashed_password=hash_password(new_password))
     )
     await session.execute(stmt)
@@ -132,13 +147,13 @@ async def set_new_password(
 
 
 async def change_password(
-    current_user_email: str, new_password: str,
+    user_id: int, new_password: str,
     session: AsyncSession
 ):
     """ Changing the user's old password """
     stmt = (
         update(User).
-        where(User.email == current_user_email).
+        where(User.id == user_id).
         values(hashed_password=hash_password(new_password))
     )
     await session.execute(stmt)

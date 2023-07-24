@@ -1,6 +1,6 @@
-from typing import List
+import re
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class Profession(BaseModel):
@@ -35,6 +35,12 @@ class UserCreate(BaseModel):
     experience: int
     # avatar: str = None
     about: str
+
+    @field_validator("email")
+    def validate_email(cls, email):
+        if re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            return email
+        raise ValueError("Invalid email")
 
 
 class ResetPassword(BaseModel):
