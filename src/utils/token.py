@@ -33,9 +33,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        email = payload.get("username")
-        if email is None:
+        user_data = payload.get("sub")
+        if user_data is None:
             raise credentials_exception
-        return email
+        return user_data
     except (PyJWTError, ValidationError):
         raise credentials_exception

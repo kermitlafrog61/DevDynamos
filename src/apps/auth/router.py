@@ -23,10 +23,9 @@ async def profile_register(user: UserCreate, session: AsyncSession = Depends(get
     try:
         # creating user in database
         return await views.create_user(user, session)
-    except IntegrityError as e:
+    except IntegrityError:
         """ Handling 'existing user' exception
         """
-        print(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User already registered.")
 
@@ -42,19 +41,19 @@ async def profile_activation(activation_code: str, session: AsyncSession = Depen
 async def profile_login(body: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_async_session)):
     """ Account login
     """
-    user = await views.get_user(email=body.username, session=session)
+    user = await views.get_user_by_email(email=body.username, session=session)
     password = user.hashed_password
-    verified_password = verify_password(
-        plain_password=body.password, hashed_password=password)
-
-    if not verified_password:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Incorrect password.")
+    verify_password(plain_password=body.password, hashed_password=password)
 
     if user.is_active == True:
         # creating token
         access_token = await create_access_token(
-            data=body.__dict__,
+            data={
+                "sub": {
+                    "id": user.id,
+                    "email": user.email,
+                },
+            },
         )
         return {
             "access_token": access_token,
@@ -84,7 +83,7 @@ async def profile_set_new_password(
 ):
     """ Updating user password """
     return await views.set_new_password(
-        email=request.email, recovery_code=request.recovery_code,
+        user_id=request.email, recovery_code=request.recovery_code,
         new_password=request.new_password, session=session
     )
 
@@ -92,33 +91,25 @@ async def profile_set_new_password(
 @router.post("/password-change")
 async def profile_password_change(
     request: PasswordChange,
-    current_user_email: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ):
     """ Changing user password """
     try:
-        user = await views.get_user(email=current_user_email, session=session)
-        if user.is_active == True:
-            veryfied_password = verify_password(
-                plain_password=request.old_password, hashed_password=user.hashed_password)
-
-            if not veryfied_password:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN, detail="Old password mismatch.")
-
-            return await views.change_password(
-                current_user_email=current_user_email,
-                new_password=request.new_password, session=session
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Account not activated.")
+        user = await views.get_user_by_id(email=current_user['id'], session=session)
+        verify_password(
+            plain_password=request.old_password, hashed_password=user.hashed_password)
+        
+        return await views.change_password(
+            user_id=current_user['id'],
+            new_password=request.new_password, session=session
+        )
     except IndexError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Incorrect email.")
 
 
 @router.get('users/me', response_model=UserRead)
-async def get_current_user_info(current_user_email: str = Depends(get_current_user), session: AsyncSession = Depends(get_async_session)):
-    user = await views.get_user(email=current_user_email, session=session)
+async def get_current_user_info(current_user: dict = Depends(get_current_user), session: AsyncSession = Depends(get_async_session)):
+    user = await views.show_user_by_id(id=current_user['id'], session=session)
     return user
