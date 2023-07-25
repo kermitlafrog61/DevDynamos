@@ -1,14 +1,13 @@
 import uuid
-from typing import Coroutine
 
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.auth.tasks import send_email_confirmation, send_email_recovery
-from utils.hasher import hash_password, verify_password
+from utils.hasher import hash_password
 
+from .tasks import send_email_confirmation, send_email_recovery
 from .models import User
 from .schemas import UserCreate
 
@@ -68,7 +67,6 @@ async def check_activation_code(code: str, session: AsyncSession):
         raise HTTPException(status_code=404, detail="User not found")
     user.activation_code = ""
     await session.commit()
-    # FIXME Check if working
     return user
 
 

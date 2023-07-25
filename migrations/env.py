@@ -3,7 +3,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from src.apps.auth.models import metadata as metadata_auth
+from src.apps.auth.models import metadata
+from src.apps.courses.models import metadata
 from src.core.settings import settings
 
 
@@ -15,7 +16,7 @@ config.set_section_option(section, "DATABASE_URL", settings.DATABASE_URL)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = [metadata_auth]
+target_metadata = [metadata]
 
 
 def run_migrations_offline() -> None:

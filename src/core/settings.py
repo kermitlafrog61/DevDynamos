@@ -1,8 +1,14 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings
 
 
 class AppConfig(BaseSettings):
+    BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
+    BASE_URL: str = 'http://localhost:8000'
     SECRET_KEY: str
+    MEDIA_ROOT: Path = BASE_DIR / 'media'
+    MEDIA_URL: str = BASE_URL + '/media/'
 
 class AdminConfig(BaseSettings):
     ADMIN_USERNAME: str
