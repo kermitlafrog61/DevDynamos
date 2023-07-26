@@ -48,13 +48,7 @@ async def create_activation_code(email: str, session: AsyncSession) -> str:
         values(activation_code=activation_code)
     )
     await session.execute(stmt)
-    try:
-        await session.commit()
-    except IndexError:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, {
-            "message": "Current User not found"
-        })
-
+    await session.commit()
     return activation_code
 
 
@@ -76,9 +70,9 @@ async def create_user(user: UserCreate, session: AsyncSession):
     data = user.model_dump()
     data['hashed_password'] = hash_password(data.pop('password'))
     new_user = User(**data)
-    await create_activation_code(email=new_user.email, session=session)
     session.add(new_user)
     await session.commit()
+    await create_activation_code(email=new_user.email, session=session)
     await session.refresh(new_user)
     await new_user.awaitable_attrs.profession
 
@@ -162,7 +156,7 @@ async def change_password(
 
 
 async def user_update(
-    user_id: int, user_data: UserUpdate, session: AsyncSession):
+        user_id: int, user_data: UserUpdate, session: AsyncSession):
     """ Updating user's data """
     data = user_data.model_dump(exclude_none=True)
     user = await get_user_by_id(id=user_id, session=session)
