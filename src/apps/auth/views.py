@@ -9,7 +9,7 @@ from utils.hasher import hash_password
 
 from .tasks import send_email_confirmation, send_email_recovery
 from .models import User
-from .schemas import UserCreate
+from .schemas import UserCreate, UserUpdate
 
 
 async def get_user_by_id(id: int, session: AsyncSession):
@@ -159,3 +159,12 @@ async def change_password(
     return {
         "message": "Password has been updated successfully."
     }
+
+
+async def user_update(
+    user_id: int, user_data: UserUpdate, session: AsyncSession):
+    """ Updating user's data """
+    user = await get_user_by_id(id=user_id, session=session)
+    user.update(user_data.model_dump())
+    await session.commit()
+    return user

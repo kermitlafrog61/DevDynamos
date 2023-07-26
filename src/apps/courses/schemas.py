@@ -1,9 +1,10 @@
 from typing import Optional
 
 from fastapi import UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 from apps.auth.schemas import Profession
+from core.settings import settings
 
 
 class CourseCreate(BaseModel):
@@ -31,6 +32,10 @@ class CourseRead(BaseModel):
 
     class Config:
         orm_mode = True
+    
+    @field_serializer('photo_url')
+    def photo_url_serializer(self, value):
+        return f'{settings.MEDIA_URL}{value}'
 
 
 class CourseList(BaseModel):

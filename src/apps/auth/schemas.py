@@ -14,12 +14,13 @@ class UserRead(BaseModel):
     id: int
     email: str
     username: str
-    name: str
-    last_name: str
-    profession: Profession
-    experience: int
-    # avatar: str = None
-    about: str
+    profession: Profession | None = None
+    name: str | None = None
+    last_name: str | None = None
+    profession_id: int | None = None
+    experience: int | None = None
+    avatar: str | None = None
+    about: str | None = None
 
     class Config:
         from_attributes = True
@@ -29,12 +30,6 @@ class UserCreate(BaseModel):
     email: str
     username: str
     password: str
-    name: str
-    last_name: str
-    profession_id: int
-    experience: int
-    # avatar: str = None
-    about: str
 
     @field_validator("email")
     def validate_email(cls, email):
@@ -55,3 +50,12 @@ class PasswordRecovery(ResetPassword):
 class PasswordChange(BaseModel):
     old_password: str
     new_password: str
+
+
+class UserUpdate(BaseModel):
+    name: str | None = None
+    last_name: str | None = None
+    profession_id: int | None = None
+    experience: int | None = None
+    avatar_url: str | None = None
+    about: str | None = None

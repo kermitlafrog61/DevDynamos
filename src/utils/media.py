@@ -12,4 +12,4 @@ async def save_image(file: UploadFile):
     with open(f'{settings.MEDIA_ROOT}/{file.filename}', 'wb') as f:
         f.write(contents)
 
-    return f"{settings.MEDIA_URL}{file.filename}"
+    return file.filename

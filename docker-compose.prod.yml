@@ -36,7 +36,6 @@ services:
       - api
     env_file:
       - .env
-    volumes:
 
   nginx:
     build:

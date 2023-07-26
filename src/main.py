@@ -1,11 +1,10 @@
 from fastapi import FastAPI
-from fastapi.exceptions import ResponseValidationError
-from fastapi.responses import Response
 from sqladmin import Admin
 
 from apps.auth import router as auth_router
 from apps.auth.admin import CertificateAdmin, ProfessionAdmin, UserAdmin
 from apps.courses import router as courses_router
+from apps.courses.admin import CourseAdmin, LectionAdmin
 from core.admin import AdminAuth
 from core.database import engine
 
@@ -25,6 +24,8 @@ admin = Admin(app=app, engine=engine,
 admin.add_view(UserAdmin)
 admin.add_view(ProfessionAdmin)
 admin.add_view(CertificateAdmin)
+admin.add_view(CourseAdmin)
+admin.add_view(LectionAdmin)
 
 
 # Including routers

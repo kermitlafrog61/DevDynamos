@@ -2,7 +2,6 @@ from typing import List
 
 from fastapi import (APIRouter, Depends, File, Form, HTTPException, UploadFile,
                      status)
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_async_session

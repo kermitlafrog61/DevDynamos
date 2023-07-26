@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, File, Form, UploadFile
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -99,7 +99,7 @@ async def profile_password_change(
         user = await views.get_user_by_id(email=current_user['id'], session=session)
         verify_password(
             plain_password=request.old_password, hashed_password=user.hashed_password)
-        
+
         return await views.change_password(
             user_id=current_user['id'],
             new_password=request.new_password, session=session
@@ -109,7 +109,21 @@ async def profile_password_change(
             status_code=status.HTTP_404_NOT_FOUND, detail="Incorrect email.")
 
 
-@router.get('users/me', response_model=UserRead)
+@router.get('/users/me', response_model=UserRead)
 async def get_current_user_info(current_user: dict = Depends(get_current_user), session: AsyncSession = Depends(get_async_session)):
     user = await views.show_user_by_id(id=current_user['id'], session=session)
+    return user
+
+
+@router.put('/users/me', response_model=UserRead)
+async def update_current_user_info(
+        name: str | None = Form(None),
+        last_name: str | None = Form(None),
+        profession_id: int | None = Form(None),
+        experience: int | None = Form(None),
+        avatar: UploadFile | None = File(None),
+        about: str | None = Form(None),
+        current_user: dict = Depends(get_current_user),
+        session: AsyncSession = Depends(get_async_session)):
+    user = await views.user_update(id=current_user['id'], session=session)
     return user
