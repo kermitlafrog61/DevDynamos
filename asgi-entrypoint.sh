@@ -1,5 +1,12 @@
 #!/bin/sh
 
+
+until alembic upgrade head
+do
+    echo "Waiting for migrations..."
+    sleep 2
+done
+
 cd src/
 
 until uvicorn main:app --reload --host 0.0.0.0;
