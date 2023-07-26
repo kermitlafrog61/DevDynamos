@@ -4,7 +4,7 @@ from .models import User, Profession, Certificate
 
 
 class UserAdmin(ModelView, model=User):
-    column_list = [User.id, User.username]
+    column_list = [User.id, User.username, User.email]
 
 
 class ProfessionAdmin(ModelView, model=Profession):
