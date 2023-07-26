@@ -31,8 +31,8 @@ class CourseRead(BaseModel):
     profession: Profession
 
     class Config:
-        orm_mode = True
-    
+        from_attributes = True
+
     @field_serializer('photo_url')
     def photo_url_serializer(self, value):
         return f'{settings.MEDIA_URL}{value}'
