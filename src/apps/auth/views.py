@@ -65,8 +65,7 @@ async def check_activation_code(code: str, session: AsyncSession):
 
 
 async def create_user(user: UserCreate, session: AsyncSession):
-    """ Creating user with email sending
-    """
+    """ Creating user with email sending """
     data = user.model_dump()
     data['hashed_password'] = hash_password(data.pop('password'))
     new_user = User(**data)
@@ -82,8 +81,7 @@ async def create_user(user: UserCreate, session: AsyncSession):
 
 
 async def activate_account(code: str, session: AsyncSession):
-    """ Activating user account
-    """
+    """ Activating user account """
     await check_activation_code(code=code, session=session)
     stmt = (
         update(User).
