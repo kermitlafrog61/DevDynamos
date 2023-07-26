@@ -28,7 +28,6 @@ services:
     image: redis:alpine
     expose:
       - 6379
-
   celery:
     image: kermitlafrog61/devdynamos-api
     working_dir: /app/src

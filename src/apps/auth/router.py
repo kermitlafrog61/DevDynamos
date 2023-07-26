@@ -3,6 +3,7 @@ from fastapi import (APIRouter, Depends, File, Form, HTTPException, UploadFile,
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Any
 
 from core.common import UserRead
 from core.database import get_async_session
@@ -20,15 +21,14 @@ router = APIRouter(
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserRead)
-async def profile_register(user: UserCreate, session: AsyncSession = Depends(get_async_session)):
-    """ User registration
-    """
+async def profile_register(user: UserCreate, session: AsyncSession = Depends(get_async_session)) -> Any:
+    """ User registration """
     try:
         # creating user in database
         return await views.create_user(user, session)
-    except IntegrityError:
-        """ Handling 'existing user' exception
-        """
+    except IntegrityError as e:
+        """ Handling 'existing user' exception """
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User already registered.")
 

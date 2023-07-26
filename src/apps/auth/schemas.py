@@ -4,7 +4,20 @@ from core.settings import settings
 
 
 class Profession(BaseModel):
+<<<<<<< HEAD
     id: int
+=======
+    name: str
+
+    class Config:
+        from_attributes = True
+
+# id: int
+
+class UserRead(BaseModel):
+    email: str
+    username: str
+>>>>>>> b0194f4 (fixing)
     name: str
 
     class Config:

@@ -76,7 +76,8 @@ async def create_user(user: UserCreate, session: AsyncSession):
     await session.refresh(new_user)
     await await_awaitable_attrs(new_user)
     send_email_confirmation.delay(
-        new_user.email, new_user.activation_code)
+        new_user.email, new_user.activation_code
+    )
     return new_user
 
 

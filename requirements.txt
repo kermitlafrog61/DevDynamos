@@ -1,0 +1,11 @@
+fastapi[all]
+asyncpg
+sqlalchemy
+alembic
+python-decouple
+celery
+redis
+passlib
+PyJWT
+sqladmin
+pydantic-settings

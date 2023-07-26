@@ -1,5 +1,6 @@
 #!/bin/sh
 
+<<<<<<< HEAD
 
 until alembic upgrade head
 do
@@ -7,6 +8,8 @@ do
     sleep 2
 done
 
+=======
+>>>>>>> b0194f4 (fixing)
 cd src/
 
 until uvicorn main:app --reload --host 0.0.0.0;
