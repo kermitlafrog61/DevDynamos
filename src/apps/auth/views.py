@@ -164,7 +164,12 @@ async def change_password(
 async def user_update(
     user_id: int, user_data: UserUpdate, session: AsyncSession):
     """ Updating user's data """
+    data = user_data.model_dump(exclude_none=True)
     user = await get_user_by_id(id=user_id, session=session)
-    user.update(user_data.model_dump())
+    for key, value in data.items():
+        setattr(user, key, value)
+    session.add(user)
     await session.commit()
+    await session.refresh(user)
+    await user.awaitable_attrs.profession
     return user

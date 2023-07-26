@@ -6,10 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_async_session
 from utils.hasher import verify_password
 from utils.token import create_access_token, get_current_user
+from utils.media import save_image
 
 from . import views
 from .schemas import (PasswordChange, PasswordRecovery, ResetPassword,
-                      UserCreate, UserRead)
+                      UserCreate, UserRead, UserUpdate)
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -111,7 +112,7 @@ async def profile_password_change(
 
 @router.get('/users/me', response_model=UserRead)
 async def get_current_user_info(current_user: dict = Depends(get_current_user), session: AsyncSession = Depends(get_async_session)):
-    user = await views.show_user_by_id(id=current_user['id'], session=session)
+    user = await views.show_user(id=current_user['id'], session=session)
     return user
 
 
@@ -121,9 +122,20 @@ async def update_current_user_info(
         last_name: str | None = Form(None),
         profession_id: int | None = Form(None),
         experience: int | None = Form(None),
-        avatar: UploadFile | None = File(None),
+        avatar: UploadFile = File(None),
         about: str | None = Form(None),
         current_user: dict = Depends(get_current_user),
         session: AsyncSession = Depends(get_async_session)):
-    user = await views.user_update(id=current_user['id'], session=session)
+
+    avatar_url = await save_image(file=avatar) if avatar else None
+
+    user = UserUpdate(
+        name=name,
+        last_name=last_name,
+        profession_id=profession_id,
+        experience=experience,
+        avatar_url=avatar_url,
+        about=about,)
+
+    user = await views.user_update(user_id=current_user['id'], user_data=user, session=session)
     return user
