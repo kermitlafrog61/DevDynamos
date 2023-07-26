@@ -1,3 +1,4 @@
+from fastapi import UploadFile
 from pydantic import BaseModel, field_serializer, EmailStr
 
 from core.settings import settings
@@ -36,7 +37,7 @@ class UserUpdate(BaseModel):
     last_name: str | None = None
     profession_id: int | None = None
     experience: int | None = None
-    avatar_url: str | None = None
+    avatar: UploadFile | None = None
     about: str | None = None
 
 

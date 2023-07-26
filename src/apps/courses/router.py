@@ -4,15 +4,14 @@ from fastapi import (APIRouter, Depends, File, Form, HTTPException, UploadFile,
                      status)
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import get_async_session
 from core.common import CourseRead
+from core.database import get_async_session
 from utils.media import save_image
 from utils.token import get_current_user
 
 from . import views
+from .permissions import is_mentor_of_course, is_owner
 from .schemas import CourseCreate, CourseList, CourseUpdate
-from .permissions import is_owner
-
 
 router = APIRouter(
     prefix="/api/v1/courses",
@@ -35,7 +34,7 @@ async def create_course(
 ):
     """ Creating new course
     """
-    is_owner(current_user['id'], session)
+    await is_owner(current_user['id'], session)
     photo_url = await save_image(photo)
 
     course = CourseCreate(
@@ -68,20 +67,23 @@ async def get_courses(session: AsyncSession = Depends(get_async_session)):
 @router.put("/{course_id}", response_model=CourseRead)
 async def update_course(
     course_id: int,
-    name: str = Form(...),
-    about: str = Form(...),
-    profession_id: int = Form(...),
-    price: int = Form(...),
-    photo: UploadFile = File(...),
+    name: str = Form(None),
+    about: str = Form(None),
+    profession_id: int = Form(None),
+    price: int = Form(None),
+    photo: UploadFile = File(None),
     session: AsyncSession = Depends(get_async_session),
     current_user: dict = Depends(get_current_user)
 ):
 
-    data = CourseUpdate(
+    await is_mentor_of_course(current_user['id'], course_id, session)
+    course = CourseUpdate(
         name=name,
         about=about,
         profession_id=profession_id,
         price=price,
+        photo=photo,
     )
 
-    course = await views.course_update(course_id, data, session)
+    course = await views.course_update(course_id, course, session)
+    return course

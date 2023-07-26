@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from fastapi import UploadFile
@@ -13,3 +14,7 @@ async def save_image(file: UploadFile):
         f.write(contents)
 
     return file.filename
+
+
+def delete_image(filename: str):
+    os.remove(f'{settings.MEDIA_ROOT}/{filename}')

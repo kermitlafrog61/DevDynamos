@@ -6,6 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from utils.hasher import hash_password
+from utils.media import save_image, delete_image
 from utils.asyncio import await_awaitable_attrs
 
 from .tasks import send_email_confirmation, send_email_recovery
@@ -152,6 +153,11 @@ async def user_update(
     data = user_data.model_dump(exclude_none=True)
     user = await get_user_by_id(id=user_id, session=session)
     for key, value in data.items():
+        if key == 'avatar':
+            if user.avatar_url is not None:
+                delete_image(user.avatar_url)
+            key = 'avatar_url'
+            value = await save_image(value)
         setattr(user, key, value)
     session.add(user)
     await session.commit()

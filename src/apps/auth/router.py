@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.common import UserRead
 from core.database import get_async_session
 from utils.hasher import verify_password
-from utils.media import save_image
 from utils.token import create_access_token, get_current_user
 
 from . import views
@@ -129,14 +128,12 @@ async def update_current_user_info(
         current_user: dict = Depends(get_current_user),
         session: AsyncSession = Depends(get_async_session)):
 
-    avatar_url = await save_image(file=avatar) if avatar else None
-
     user = UserUpdate(
         name=name,
         last_name=last_name,
         profession_id=profession_id,
         experience=experience,
-        avatar_url=avatar_url,
+        avatar=avatar,
         about=about,)
 
     user = await views.user_update(user_id=current_user['id'], user_data=user, session=session)

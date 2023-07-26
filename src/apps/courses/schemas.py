@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from fastapi import UploadFile
 from pydantic import BaseModel, field_serializer
@@ -25,7 +25,7 @@ class CourseUpdate(BaseModel):
     about: Optional[str]
     profession_id: Optional[int]
     price: Optional[int]
-    photo_url: Optional[UploadFile]
+    photo: Optional[UploadFile]
 
 
 class CourseList(BaseModel):

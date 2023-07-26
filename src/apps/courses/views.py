@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from utils.asyncio import await_awaitable_attrs
+from utils.media import delete_image, save_image
 
 from .models import Course
 from .schemas import CourseCreate, CourseUpdate
@@ -43,9 +44,15 @@ async def course_update(
         course_id: int, course_data: CourseUpdate, session: AsyncSession):
     """ Updating user's data """
     data = course_data.model_dump(exclude_none=True)
-    course = await get_course_by_id(id=course_id, session=session)
+    course = await get_course_by_id(course_id, session)
     for key, value in data.items():
+        if key == 'photo':
+            if course.photo_url is not None:
+                delete_image(course.photo_url)
+            key = 'photo_url'
+            value = await save_image(value)
         setattr(course, key, value)
+
     session.add(course)
     await session.commit()
     await session.refresh(course)
