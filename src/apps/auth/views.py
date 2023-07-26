@@ -81,22 +81,14 @@ async def create_user(user: UserCreate, session: AsyncSession):
 
 
 async def activate_account(code: str, session: AsyncSession):
-    """ Activating user account """
-    await check_activation_code(code=code, session=session)
-    stmt = (
-        update(User).
-        where(User.activation_code == code).
-        values(is_active=True)
-    )
+    """ Activating user account
+    """
+    stmt = (update(User)
+            .where(User.activation_code == code)
+            .values(is_active=True))
     await session.execute(stmt)
-
-    try:
-        await session.commit()
-    except IndexError:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, {
-            "message": "Incorrect code, please try again."
-        })
-
+    await session.commit()
+    await check_activation_code(code=code, session=session)
     return {
         "message": "Account activated successfully!"
     }

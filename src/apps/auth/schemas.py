@@ -1,6 +1,6 @@
 import re
 
-from pydantic import BaseModel, field_validator, field_serializer
+from pydantic import BaseModel, field_validator, field_serializer, EmailStr
 
 from core.settings import settings
 
@@ -15,7 +15,7 @@ class Profession(BaseModel):
 
 class UserRead(BaseModel):
     id: int
-    email: str
+    email: EmailStr
     username: str
     profession: Profession | None = None
     name: str | None = None
@@ -33,19 +33,13 @@ class UserRead(BaseModel):
 
 
 class UserCreate(BaseModel):
-    email: str
+    email: EmailStr
     username: str
     password: str
 
-    @field_validator("email")
-    def validate_email(cls, email):
-        if re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            return email
-        raise ValueError("Invalid email")
-
 
 class ResetPassword(BaseModel):
-    email: str
+    email: EmailStr
 
 
 class PasswordRecovery(ResetPassword):
