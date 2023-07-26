@@ -12,6 +12,7 @@ services:
 
   api:
     build: .
+    image: kermitlafrog61/devdynamos-api
     entrypoint: ./asgi-entrypoint.sh
     volumes:
       - .:/app
@@ -29,7 +30,7 @@ services:
       - 6379
 
   celery:
-    build: .
+    image: kermitlafrog61/devdynamos-api
     working_dir: /app/src
     command: celery -A core worker -l info
     depends_on:
