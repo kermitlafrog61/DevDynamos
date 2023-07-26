@@ -40,7 +40,7 @@ services:
   nginx:
     build:
       dockerfile: Dockerfile
-      context: ./nginx/dev
+      context: ./nginx
     env_file:
       - .env
     volumes:

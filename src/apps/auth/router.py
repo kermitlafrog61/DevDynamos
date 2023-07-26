@@ -64,7 +64,7 @@ async def profile_login(body: OAuth2PasswordRequestForm = Depends(), session: As
             }
         }
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Inactive account.")
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive account.")
 
 
 @router.post("/reset-password")
