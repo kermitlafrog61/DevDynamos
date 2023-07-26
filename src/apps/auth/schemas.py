@@ -1,6 +1,4 @@
-import re
-
-from pydantic import BaseModel, field_validator, field_serializer, EmailStr
+from pydantic import BaseModel, field_serializer, EmailStr
 
 from core.settings import settings
 
@@ -11,25 +9,6 @@ class Profession(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class UserRead(BaseModel):
-    id: int
-    email: EmailStr
-    username: str
-    profession: Profession | None = None
-    name: str | None = None
-    last_name: str | None = None
-    experience: int | None = None
-    avatar_url: str | None = None
-    about: str | None = None
-
-    class Config:
-        from_attributes = True
-
-    @field_serializer('avatar_url')
-    def avatar_url_serializer(self, value):
-        return f'{settings.MEDIA_URL}{value}' if value else None
 
 
 class UserCreate(BaseModel):
@@ -59,3 +38,17 @@ class UserUpdate(BaseModel):
     experience: int | None = None
     avatar_url: str | None = None
     about: str | None = None
+
+
+class UserList(BaseModel):
+    id: int
+    email: EmailStr
+    username: str
+    name: str | None = None
+    last_name: str | None = None
+    experience: int | None = None
+    avatar_url: str | None = None
+
+    @field_serializer('avatar_url')
+    def avatar_url_serializer(self, value):
+        return f'{settings.MEDIA_URL}{value}' if value else None

@@ -1,16 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status, File, Form, UploadFile
+from fastapi import (APIRouter, Depends, File, Form, HTTPException, UploadFile,
+                     status)
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.common import UserRead
 from core.database import get_async_session
 from utils.hasher import verify_password
-from utils.token import create_access_token, get_current_user
 from utils.media import save_image
+from utils.token import create_access_token, get_current_user
 
 from . import views
 from .schemas import (PasswordChange, PasswordRecovery, ResetPassword,
-                      UserCreate, UserRead, UserUpdate)
+                      UserCreate, UserUpdate)
 
 router = APIRouter(
     prefix="/api/v1/auth",

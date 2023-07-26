@@ -6,6 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from utils.hasher import hash_password
+from utils.asyncio import await_awaitable_attrs
 
 from .tasks import send_email_confirmation, send_email_recovery
 from .models import User
@@ -35,7 +36,7 @@ async def get_user_by_email(email: str, session: AsyncSession):
 async def show_user(id: int, session: AsyncSession):
     """ Showing user """
     user = await get_user_by_id(id=id, session=session)
-    await user.awaitable_attrs.profession
+    await await_awaitable_attrs(user)
     return user
 
 
@@ -73,8 +74,7 @@ async def create_user(user: UserCreate, session: AsyncSession):
     await session.commit()
     await create_activation_code(email=new_user.email, session=session)
     await session.refresh(new_user)
-    await new_user.awaitable_attrs.profession
-
+    await await_awaitable_attrs(new_user)
     send_email_confirmation.delay(
         new_user.email, new_user.activation_code)
     return new_user
@@ -155,5 +155,5 @@ async def user_update(
     session.add(user)
     await session.commit()
     await session.refresh(user)
-    await user.awaitable_attrs.profession
+    await await_awaitable_attrs(user)
     return user
