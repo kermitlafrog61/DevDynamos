@@ -37,6 +37,7 @@ class Course(Base):
 
     profession = relationship("Profession")
     lections = relationship("Lection", back_populates="course")
+    library = relationship("Library", back_populates="course")
     mentors: Mapped[list['User']] = relationship(secondary=course_mentors, # type: ignore
                            back_populates="owned_courses")
     students: Mapped[list['User']] = relationship(secondary=course_students, # type: ignore

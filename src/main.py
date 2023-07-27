@@ -5,6 +5,8 @@ from apps.auth import router as auth_router
 from apps.auth.admin import CertificateAdmin, ProfessionAdmin, UserAdmin
 from apps.courses import router as courses_router
 from apps.courses.admin import CourseAdmin, LectionAdmin
+from apps.library import router as library_router
+from apps.library.admin import LibraryAdmin
 from core.admin import AdminAuth
 from core.database import engine
 
@@ -26,9 +28,10 @@ admin.add_view(ProfessionAdmin)
 admin.add_view(CertificateAdmin)
 admin.add_view(CourseAdmin)
 admin.add_view(LectionAdmin)
-
+admin.add_view(LibraryAdmin)
 
 # Including routers
 
 app.include_router(auth_router.router, tags=["Auth"])
 app.include_router(courses_router.router, tags=["Courses"])
+app.include_router(library_router.router, tags=["Library"])

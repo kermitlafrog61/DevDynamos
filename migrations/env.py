@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from src.apps.auth.models import metadata
 from src.apps.courses.models import metadata
+from src.apps.library.models import metadata
 from src.core.settings import settings
 
 

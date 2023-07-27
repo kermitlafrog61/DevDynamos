@@ -61,6 +61,7 @@ class User(Base):
         secondary=course_mentors, back_populates="mentors")
     enrolled_courses: Mapped[list["Course"]] = relationship( # type: ignore
         secondary=course_students, back_populates="students")
+    library = relationship("Library", back_populates="account")
 
     def __str__(self) -> str:
         return self.email
