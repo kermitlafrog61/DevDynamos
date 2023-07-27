@@ -17,7 +17,7 @@ class CourseCreate(BaseModel):
     about: str
     profession_id: int
     price: int
-    photo_url: str
+    photo_url: Optional[str]
 
 
 class CourseUpdate(BaseModel):
@@ -33,7 +33,7 @@ class CourseList(BaseModel):
     name: str
     about: str
     price: int
-    photo_url: str
+    photo_url: Optional[str]
 
     @field_serializer('photo_url')
     def photo_url_serializer(self, value):
