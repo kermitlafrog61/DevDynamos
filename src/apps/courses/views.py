@@ -1,12 +1,13 @@
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from utils.asyncio import await_awaitable_attrs
 from utils.media import delete_image, save_image
 
-from .models import Course
+from .models import Course, course_students
 from .schemas import CourseCreate, CourseUpdate
 
 
@@ -58,3 +59,17 @@ async def course_update(
     await session.refresh(course)
     await await_awaitable_attrs(course)
     return course
+
+
+async def add_user_to_course(course_id: int, user_id: int, session: AsyncSession):
+    query = course_students.insert().values(course_id=course_id, user_id=user_id)
+
+    try:
+        await session.execute(query)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"User with id {user_id} is already in course")
+
+    await session.commit()
+    return await show_course(course_id, session)

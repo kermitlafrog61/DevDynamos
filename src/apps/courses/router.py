@@ -10,7 +10,7 @@ from utils.media import save_image
 from utils.token import get_current_user
 
 from . import views
-from .permissions import is_mentor_of_course, is_owner
+from .permissions import is_mentor_of_course, is_owner, is_mentor_or_student_of_course
 from .schemas import CourseCreate, CourseList, CourseUpdate
 
 router = APIRouter(
@@ -49,9 +49,14 @@ async def create_course(
 
 
 @router.get("/{course_id}", response_model=CourseRead)
-async def get_course(course_id: int, session: AsyncSession = Depends(get_async_session)):
+async def get_course(
+    course_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    current_user: dict = Depends(get_current_user)
+):
     """ Getting course by id
     """
+    await is_mentor_or_student_of_course(current_user['id'], course_id, session)
     course = await views.show_course(course_id, session)
     return course
 
@@ -86,4 +91,18 @@ async def update_course(
     )
 
     course = await views.course_update(course_id, course, session)
+    return course
+
+
+@router.post("/{course_id}/students", response_model=CourseRead)
+async def add_student_to_course(
+    course_id: int,
+    user_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    current_user: dict = Depends(get_current_user)
+):
+    """ Adding student to course
+    """
+    await is_mentor_of_course(current_user['id'], course_id, session)
+    course = await views.add_user_to_course(course_id, user_id, session)
     return course
