@@ -11,7 +11,6 @@ from core.settings import settings
 TOKEN_EXPIRE_MINUTES = 15000000
 
 
-
 async def create_access_token(*, data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
@@ -30,7 +29,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"}
     )
-    
+
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         user_data = payload.get("sub")
