@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr, field_serializer, HttpUrl
 
@@ -33,7 +33,7 @@ class CourseRead(BaseModel):
     name: str
     about: str
     price: int
-    photo_url: str
+    photo_url: Optional[str]
     profession: Profession
     mentors: List[UserList] = []
     students: List[UserList] = []
