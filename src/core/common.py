@@ -44,7 +44,7 @@ class CourseRead(BaseModel):
 
     @field_serializer('photo_url')
     def photo_url_serializer(self, value):
-        return f'{settings.MEDIA_URL}{value}'
+        return f'{settings.MEDIA_URL}{value}' if value else None
 
 
 class LectionRead(BaseModel):
@@ -57,5 +57,4 @@ class LectionRead(BaseModel):
 
     @field_serializer('homework_url')
     def serializer_homework_url(self, value):
-        return f'{settings.MEDIA_URL}{value}'
-
+        return f'{settings.MEDIA_URL}{value}' if value else None

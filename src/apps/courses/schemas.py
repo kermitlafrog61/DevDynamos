@@ -37,4 +37,4 @@ class CourseList(BaseModel):
 
     @field_serializer('photo_url')
     def photo_url_serializer(self, value):
-        return f'{settings.MEDIA_URL}{value}'
+        return f'{settings.MEDIA_URL}{value}' if value else None
