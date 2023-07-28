@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqladmin import Admin
 
 from apps.auth import router as auth_router
@@ -7,14 +8,19 @@ from apps.courses import router as courses_router
 from apps.courses.admin import CourseAdmin, LectionAdmin
 from core.admin import AdminAuth
 from core.database import engine
-
 from core.settings import settings
-
 
 app = FastAPI(
     title="DevDynamos",
     description="Project created for hackathos",
     version="1.0",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Configuring admin panel
